@@ -1,0 +1,39 @@
+apply plugin: 'com.android.library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    def unityJar = project.findProperty("unity.classesJar")
+    if (unityJar != null && unityJar.toString().trim()) {
+        compileOnly files(unityJar)
+    } else {
+        compileOnly fileTree(
+            dir: project(':unityLibrary').projectDir.toString() + '/libs',
+            include: ['*.jar']
+        )
+    }
+}
+android {
+    namespace "com.unity3d.accessibility"
+    compileSdk getProperty("unity.compileSdkVersion") as int
+    buildToolsVersion = getProperty("unity.buildToolsVersion")
+
+    compileOptions {
+        sourceCompatibility JavaVersion.valueOf(getProperty("unity.javaCompatibilityVersion"))
+        targetCompatibility JavaVersion.valueOf(getProperty("unity.javaCompatibilityVersion"))
+    }
+
+    defaultConfig {
+        minSdk getProperty("unity.minSdkVersion") as int
+        targetSdk getProperty("unity.targetSdkVersion") as int
+
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
